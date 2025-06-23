@@ -167,12 +167,23 @@ class SpeechToTextApp(QMainWindow):
         
     def update_text(self, text):
         current_text = self.text_display.toPlainText()
-        if current_text.endswith("Listening...\n"):
-            self.text_display.setPlainText(current_text + text)
-        else:
-            lines = current_text.split('\n')
-            lines[-1] = text
-            self.text_display.setPlainText('\n'.join(lines))
+    
+        # Clear initial "Listening..." message
+        if current_text == "Listening...\n":
+            current_text = ""
+        
+        # If we have existing text and the new text doesn't start with punctuation
+        if current_text and text and not text[0] in '.!?,;':
+            # Add space between words
+            if not current_text.endswith(' '):
+                current_text += ' '
+        
+        self.text_display.setPlainText(current_text + text)
+    
+        # Auto-scroll to bottom
+        cursor = self.text_display.textCursor()
+        cursor.movePosition(cursor.End)
+        self.text_display.setTextCursor(cursor)
             
     def clear_text(self):
         self.text_display.clear()
